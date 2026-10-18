@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Happy Birthday 💙</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a1f44 0%, #1e3a8a 40%, #3b82f6 100%);
+    color: #fff;
+  }
+
+  /* Floating Lily Background */
+  .lily {
+    position: fixed;
+    font-size: 2.5rem;
+    opacity: 0.6;
+    animation: floatUp linear infinite;
+    pointer-events: none;
+    z-index: 1;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.7; }
+    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Fireworks Canvas */
+  #fireworks {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Sections */
+  section {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease, visibility 1s ease;
+    z-index: 3;
+  }
+  section.active { opacity: 1; visibility: visible; }
+
+  /* Glass Card */
+  .glass {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    padding: 40px 30px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    animation: floatCard 4s ease-in-out infinite;
+  }
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #fff, #bfdbfe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(191, 219, 254, 0.5);
+  }
+
+  input {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  input::placeholder { color: rgba(255,255,255,0.6); }
+  input:focus {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+  }
+
+  /* Liquid Glass Button */
+  .btn-liquid {
+    position: relative;
+    padding: 14px 30px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+    backdrop-filter: blur(15px);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+      0 4px 20px rgba(0,0,0,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .btn-liquid::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.4), transparent 60%);
+    transform: scale(0);
+    transition: transform 0.6s;
+  }
+  .btn-liquid:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+      0 10px 30px rgba(59, 130, 246, 0.5),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    border-color: rgba(255,255,255,0.6);
+  }
+  .btn-liquid:hover::before { transform: scale(1); }
+  .btn-liquid:active { transform: translateY(0) scale(0.98); }
+
+  /* Main Screen */
+  #name-display {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    background: linear-gradient(90deg, #60a5fa, #fff, #60a5fa);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 3s linear infinite;
+    min-height: 60px;
+  }
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+
+  #message {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin: 20px 0 30px;
+    min-height: 80px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 1s;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  /* Message Modal */
+  #message-screen .glass {
+    max-width: 600px;
+  }
+  #detail-message {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    margin-bottom: 25px;
+    text-align: left;
+  }
+
+  /* Mobile */
+  @media (max-width: 500px) {
+    h1 { font-size: 1.5rem; }
+    #name-display { font-size: 1.8rem; }
+    .glass { padding: 30px 20px; }
+    .btn-liquid { padding: 12px 22px; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating Lily Flowers -->
+<div id="lilies"></div>
+
+<!-- Fireworks Canvas -->
+<canvas id="fireworks"></canvas>
+
+<!-- Section 1: Input Name -->
+<section id="intro-screen" class="active">
+  <div class="glass">
+    <h1>💙 Selamat Datang 💙</h1>
+    <p style="margin-bottom:20px; opacity:0.9;">Masukkan nama kamu dulu ya...</p>
+    <input type="text" id="name-input" placeholder="Ketik namamu di sini..." maxlength="20"/>
+    <button class="btn-liquid" id="enter-btn">Masuk ✨</button>
+  </div>
+</section>
+
+<!-- Section 2: Main Greeting -->
+<section id="main-screen">
+  <div class="glass">
+    <h1>🎉 Happy Birthday 🎉</h1>
+    <div id="name-display"></div>
+    <p id="message">Semoga harimu seindah bunga lily... 💙</p>
+    <div class="btn-group">
+      <button class="btn-liquid" data-action="message">💌 Baca Pesan</button>
+      <button class="btn-liquid" data-action="surprise">🎁 Kejutan</button>
+      <button class="btn-liquid" data-action="hug">🤗 Peluk Aku</button>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3: Detail Message -->
+<section id="message-screen">
+  <div class="glass">
+    <h1>💌 Untukmu 💌</h1>
+    <p id="detail-message">
+      Hai <span class="user-name"></span>,<br><br>
+      Di hari spesialmu ini, aku cuma mau bilang...<br>
+      Terima kasih sudah jadi bagian terindah dalam hidupku. 🌷<br><br>
+      Semoga tahun ini membawa lebih banyak tawa, cinta, dan kebahagiaan untukmu.<br>
+      Kamu layak mendapatkan semua hal baik di dunia ini. 💙<br><br>
+      <em>— Selalu mencintaimu</em>
+    </p>
+    <button class="btn-liquid" id="back-btn">Kembali ↩</button>
+  </div>
+</section>
+
+<script>
+/* ============ SOUND EFFECTS (Web Audio API) ============ */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioCtx();
+
+function playClickSound() {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playFireworkSound() {
+  // Whoosh
+  const noise = audioCtx.createBufferSource();
+  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.5, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/data.length);
+  noise.buffer = buffer;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 1000;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+  noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  noise.start();
+
+  // Boom
+  setTimeout(() => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.4);
+    g.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+  }, 200);
+}
+
+/* ============ FLOATING LILIES ============ */
+const lilyContainer = document.getElementById('lilies');
+const lilyEmojis = ['🌸', '💮', '🌼', '🤍'];
+function spawnLily() {
+  const lily = document.createElement('div');
+  lily.className = 'lily';
+  lily.textContent = lilyEmojis[Math.floor(Math.random() * lilyEmojis.length)];
+  lily.style.left = Math.random() * 100 + 'vw';
+  lily.style.animationDuration = (8 + Math.random() * 8) + 's';
+  lily.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
+  lilyContainer.appendChild(lily);
+  setTimeout(() => lily.remove(), 16000);
+}
+setInterval(spawnLily, 800);
+
+/* ============ FIREWORKS (Canvas) ============ */
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resizeCanvas();
+addEventListener('resize', resizeCanvas);
+
+let particles = [];
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 6 + 2;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.alpha = 1;
+    this.color = color;
+    this.size = Math.random() * 3 + 1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.vy += 0.05; // gravity
+    this.vx *= 0.99; this.vy *= 0.99;
+    this.alpha -= 0.012;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function explode(x, y) {
+  const colors = ['#60a5fa', '#ffffff', '#93c5fd', '#bfdbfe', '#dbeafe'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  for (let i = 0; i < 80; i++) particles.push(new Particle(x, y, color));
+  playFireworkSound();
+}
+
+function animateFireworks() {
+  ctx.fillStyle = 'rgba(10, 31, 68, 0.15)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateFireworks);
+}
+animateFireworks();
+
+function launchFireworks(count = 5) {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      explode(Math.random() * canvas.width, Math.random() * canvas.height * 0.6);
+    }, i * 400);
+  }
+}
+
+/* ============ VIEW TRANSITIONS ============ */
+const intro = document.getElementById('intro-screen');
+const main = document.getElementById('main-screen');
+const msgScreen = document.getElementById('message-screen');
+
+function showSection(section) {
+  [intro, main, msgScreen].forEach(s => s.classList.remove('active'));
+  section.classList.add('active');
+}
+
+/* ============ INPUT NAME ============ */
+const nameInput = document.getElementById('name-input');
+const enterBtn = document.getElementById('enter-btn');
+const nameDisplay = document.getElementById('name-display');
+
+enterBtn.addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  playClickSound();
+  const name = nameInput.value.trim();
+  if (!name) {
+    nameInput.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.8)';
+    setTimeout(() => nameInput.style.boxShadow = '', 800);
+    return;
+  }
+  // Typewriter effect
+  let i = 0;
+  nameDisplay.textContent = '';
+  showSection(main);
+  launchFireworks(6);
+  const timer = setInterval(() => {
+    nameDisplay.textContent += name[i];
+    i++;
+    if (i >= name.length) clearInterval(timer);
+  }, 100);
+  // Update user-name in detail message
+  document.querySelectorAll('.user-name').forEach(el => el.textContent = name);
+});
+
+nameInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') enterBtn.click();
+});
+
+/* ============ MAIN BUTTONS ============ */
+document.querySelectorAll('[data-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    playClickSound();
+    const action = btn.dataset.action;
+    if (action === 'message') {
+      showSection(msgScreen);
+    } else if (action === 'surprise') {
+      launchFireworks(10);
+    } else if (action === 'hug') {
+      btn.textContent = '🤗 Pelukan terkirim! 💙';
+      launchFireworks(4);
+      setTimeout(() => btn.textContent = '🤗 Peluk Aku', 2500);
+    }
+  });
+});
+
+document.getElementById('back-btn').addEventListener('click', () => {
+  playClickSound();
+  showSection(main);
+});
+
+/* ============ INITIAL FIREWORKS ON LOAD ============ */
+window.addEventListener('load', () => {
+  setTimeout(() => launchFireworks(3), 500);
+});
+</script>
+</body>
+</html>
